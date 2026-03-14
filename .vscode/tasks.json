@@ -7,7 +7,7 @@
             "command": "uv",
             "args": ["run","main.py"],
             "options": {
-                "cwd":"${workspaceFolder}/src/example"
+                "cwd":"${workspaceFolder}/src/125970eval"
             }
         },
         {
@@ -16,7 +16,7 @@
             "command": "pyside6-designer",
             "args": ["components/main.ui"],
             "options": {
-                "cwd":"${workspaceFolder}/src/example"
+                "cwd":"${workspaceFolder}/src/125970eval"
             }
         },
         {
@@ -25,7 +25,7 @@
             "command": "pyside6-uic",
             "args": ["components/main.ui", "-o", "components/ui.py"],
             "options": {
-                "cwd":"${workspaceFolder}/src/example"
+                "cwd":"${workspaceFolder}/src/125970eval"
             }
         },
         {

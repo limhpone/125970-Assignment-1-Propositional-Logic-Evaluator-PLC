@@ -1,148 +1,84 @@
-# Compiler Starter Project
+# Propositional Logic Evaluator
 
-- [Compiler Starter Project](#compiler-starter-project)
-  - [Dependencies](#dependencies)
-  - [Getting Started](#getting-started)
-    - [VSCode setup](#vscode-setup)
-    - [Running Debug](#running-debug)
-    - [Running `Task`](#running-task)
-    - [Installing dependency](#installing-dependency)
-  - [Code Explain](#code-explain)
-    - [components/lexica.py](#componentslexicapy)
-    - [components/parsers.py](#componentsparserspy)
-      - [MyParser class](#myparser-class)
-      - [ASTParser class](#astparser-class)
-    - [components/memory.py](#componentsmemorypy)
-    - [`main.py` and `components/main.ui`](#mainpy-and-componentsmainui)
-  - [Design a GUI](#design-a-gui)
+Aye Khin Khin Hpone (Yolanda Lim)_st125970
 
-This is the starter project for the Programming Language and Compiler course @ AIT.
-Since 2024, we use `Python`.
+Assignment 1 — Programming Language and Compiler course @ AIT (January 2026)
+
+A propositional logic evaluator with two operators:
+- **∧** (and) — higher precedence
+- **∨** (or) — lower precedence
+
+Given an input expression, the program outputs:
+1. A **truth value** (`t` or `f`)
+2. An equivalent expression in **prefix notation**
 
 ## Dependencies
 
-- Python version 3.9.18
-- [`uv`](https://docs.astral.sh/uv/getting-started/installation/) for managing project
-- `PySide6` for GUI development
+- Python >= 3.10
+- [`uv`](https://docs.astral.sh/uv/getting-started/installation/) for managing the project
+- `PySide6` for GUI
+- `sly` for lexer/parser generation
 
 ## Getting Started
 
-As of January 2026, this project drop the support for `Docker`.
-We figure that it only make thing more complicated and decided to use `uv` and `vscode` to control the environment.
+1. Clone the project to your local machine.
+2. Run `uv sync` in the project root.
 
-To use this repository, follow below steps.
+### Running
 
-1. (Optional) Click `Use this template` on the top right of this page to clone this to your repository.
-2. Clone the project to your local machine.
-3. Go to project folder and run `uv sync`.
+Press <kbd>F5</kbd> in VS Code to launch using the `[125970eval] Python Debugger` config.
 
-### VSCode setup
-
-The repository has a file `.vscode/extensions.json` which will automatically install extension for you.
-In case that this mechanism fails, here are the list of required extension.
-
-- `ms-python.python`
-- `ms-python.debugpy`
-
-### Running Debug
-
-The repository has support for running the code in debug mode.
-Check the `.vscode/launch.json`.
-
-By default, you can run `[example] Python Debugger` option which launch the `src/example` module.
-We sort-of giving an example of how to create mulitple entrypoints by providing the second option `[project] Python Debugger` which is not ready to use until you create a module `src/project`.
-
-### Running `Task`
-
-To execute the module, we provide `Tasks` under the `.vscode/tasks.json`.
-There are three tasks initially.
-
-1. **start app**: For launching the `example` project.
-2. **start designer**: For launching `PySide6-designer` app.
-3. **compile designer**: For compiling the `ui` file generated from the `PySide6-designer`.
-
-To run them, you can do it from the command palette <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>.
-Choose `Tasks: Run Task`, and choose the option will appear.
-
-### Installing dependency
-
-Most of the requirement should be sorted out with `uv sync`.
-However, for no obvious reason right now, `PySide6-designer` would not run within the `uv` context.
-You will need to install the `PySide6` library again using `pip install`.
+Or use the terminal:
 
 ```sh
-pip install pyside6
+cd src/125970eval
+uv run main.py
 ```
 
-When you are done with this project, you can remove them with this
-
-```sh
-pip uninstall pyside6 PySide6_Addons PySide6_Essentials
-```
-
-## Code Explain
-
-Inside `src/example/` folder is all the code developed.
+## Project Structure
 
 ```txt
-compiler-starter-project/
+src/125970eval/
   |- components/
       |- ast/
           |- statement.py
       |- lexica.py
-      |- main.ui
-      |- memory.py
       |- parsers.py
+      |- ui.py
   |- main.py
 ```
 
-Since the project is done just to showcase libraries and techniques, here we divided it into subsections to explain the code.
-
 ### components/lexica.py
 
-This file showcases the Lexica analyzer component. It has a `MyLexer` class that extends `sly.Lexer`.
-It will translate a code/string into `token` stream/generator that feeds to a `Parser`.
-This file has a main just for testing the class.
+`PropLogicLexer` (extends `sly.Lexer`) — tokenises input into `TRUE`, `FALSE`, `AND`, `OR`, `LPAREN`, `RPAREN`. Accepts both Unicode (`∧` `∨`) and ASCII (`&` `|`) operators.
 
 ### components/parsers.py
 
-There are two parsers.
-(1) `MyParser` and (2) `ASTParser`.
+`PropLogicParser` (extends `sly.Parser`) — builds an AST from the token stream. Operator precedence: AND binds tighter than OR (both left-associative).
 
-#### MyParser class
+### components/ast/statement.py
 
-This class is what I call immediate evaluation which each of the semantics, once reduced, evaluates/calculates right away.
-This type of parser is fine for calculator projects or simple parsing.
-This parser also implements [`Memory`](#componentsmemorypy) and `Variable assignment`.
+AST node classes:
+- `Expression_bool` — leaf node holding a boolean value.
+- `Expression_logic` — binary node holding an operation (AND/OR) and two children.
 
-#### ASTParser class
+Each node implements `run()` (evaluate to `bool`) and `prefix()` (generate prefix notation string).
 
-This is a more complex but flexible way of parsing.
-[AST (Abstract Syntax Trees)](https://en.wikipedia.org/wiki/Abstract_syntax_tree) is actually a parse tree.
-This will allow you to control when to run a subsection of code like `if-else` statement.
-You can see that the semantic part is only creating an object inside `components.ast`.
-All the logic (in this case, addition and subtraction) is in the AST object.
-The Parser is there is create a parse tree that once ready will execute `.run()`.
-I only add the essentials to demonstrate this technique.
+### components/ui.py
 
-### components/memory.py
+`Ui_MainWindow` — PySide6 GUI layout with buttons for `t`, `f`, `∧`, `∨`, `(`, `)`, Clear, and Evaluate, plus output labels for the truth value and prefix expression.
 
-This contains `Memory` class which is a singleton.
-Inside is just a simple dictionary where `variable_name` is a key and `{'value':value,'data_type':<type>}` as a value.
-Whether this solution is appropriate or not is your judgment.
+### main.py
 
-### `main.py` and `components/main.ui`
+Entry point — creates the GUI window and wires button clicks to the lexer → parser → AST evaluation pipeline.
 
-Finally, the `main.py` is the main file to run the entire project.
-It will render a GUI from `components/main.ui` that was designed from `PyQt6`.
-This shows how to bind a function with a button and how to display the result back to the GUI.
+## Examples
 
-## Design a GUI
-
-We use `PySide6` and `pyside6-designer` for GUI development.
-You can start to learn this tool from 
-
-- [Official Document](https://doc.qt.io/qtforpython-6/tools/pyside-designer.html)
-- [3rd party Tutorial](https://www.pythonguis.com/tutorials/pyside6-first-steps-qt-designer/)
-
-To launch the designer, use [Running `Task`](#running-task)
+| Input       | Truth Value | Prefix Notation     |
+|-------------|-------------|---------------------|
+| `t`         | `t`         | `t`                 |
+| `f`         | `f`         | `f`                 |
+| `t∧f`       | `f`         | `(∧ t f)`           |
+| `t∨f`       | `t`         | `(∨ t f)`           |
+| `t∨f∧f`     | `t`         | `(∨ t (∧ f f))`     |
+| `(t∨f)∧f`   | `f`         | `(∧ (∨ t f) f)`     |
