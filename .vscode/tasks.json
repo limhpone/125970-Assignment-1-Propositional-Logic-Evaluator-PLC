@@ -11,34 +11,16 @@
             }
         },
         {
-            "label": "start designer",
-            "type": "shell",
-            "command": "pyside6-designer",
-            "args": ["components/main.ui"],
-            "options": {
-                "cwd":"${workspaceFolder}/src/125970eval"
-            }
-        },
-        {
-            "label": "compile designer",
-            "type": "shell",
-            "command": "pyside6-uic",
-            "args": ["components/main.ui", "-o", "components/ui.py"],
-            "options": {
-                "cwd":"${workspaceFolder}/src/125970eval"
-            }
-        },
-        {
             "label": "Install PySide6",
             "type": "shell",
             "command": "pip",
-            "args": ["install", "pyside6"],
+            "args": ["install", "pyside6"]
         },
         {
             "label": "Uninstall PySide6",
             "type": "shell",
             "command": "pip",
-            "args": ["uninstall", "-y", "pyside6", "PySide6_Addons", "PySide6_Essentials"],
-        },
+            "args": ["uninstall", "-y", "pyside6", "PySide6_Addons", "PySide6_Essentials"]
+        }
 	]
 }

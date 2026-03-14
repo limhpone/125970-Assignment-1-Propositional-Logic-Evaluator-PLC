@@ -1,7 +1,7 @@
 [project]
-name = "compiler-starter-project"
+name = "125970eval"
 version = "0.1.0"
-description = "Add your description here"
+description = "Propositional Logic Evaluator — Assignment 1 (PLC, AIT)"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

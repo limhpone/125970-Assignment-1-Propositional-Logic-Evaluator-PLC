@@ -56,7 +56,7 @@ class Expression_logic(Expression):
 
     def prefix(self) -> str:
         op_str = '∧' if self.operation == Operations.AND else '∨'
-        return f"{op_str} {self.left.prefix()} {self.right.prefix()}"
+        return f"({op_str} {self.left.prefix()} {self.right.prefix()})"
 
     def __repr__(self) -> str:
         return self.prefix()
