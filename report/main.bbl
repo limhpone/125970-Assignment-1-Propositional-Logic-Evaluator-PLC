@@ -1,0 +1,42 @@
+\begin{thebibliography}{6}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Aho et~al.(2006)Aho, Lam, Sethi, and Ullman]{aho2006compilers}
+Alfred~V. Aho, Monica~S. Lam, Ravi Sethi, and Jeffrey~D. Ullman.
+\newblock \emph{Compilers: Principles, Techniques, and Tools}.
+\newblock Addison-Wesley, Boston, MA, 2nd edition, 2006.
+
+\bibitem[{Astral}(2024)]{astral2024uv}
+{Astral}.
+\newblock {uv} --- an extremely fast python package installer and resolver.
+\newblock \url{https://github.com/astral-sh/uv}, 2024.
+\newblock Accessed: January 2026.
+
+\bibitem[Beazley(2023)]{beazley2023sly}
+David Beazley.
+\newblock {SLY} --- sly lex yacc.
+\newblock \url{https://github.com/dabeaz/sly}, 2023.
+\newblock Accessed: January 2026.
+
+\bibitem[Ben-Ari(2012)]{ben2012mathematical}
+Mordechai Ben-Ari.
+\newblock \emph{Mathematical Logic for Computer Science}.
+\newblock Springer, London, 3rd edition, 2012.
+
+\bibitem[\L{}ukasiewicz(1957)]{lukasiewicz1957}
+Jan \L{}ukasiewicz.
+\newblock \emph{Aristotle's Syllogistic from the Standpoint of Modern Formal
+  Logic}.
+\newblock Oxford University Press, Oxford, 2nd edition, 1957.
+
+\bibitem[{The Qt Company}(2024)]{qtforpython2024}
+{The Qt Company}.
+\newblock {Qt for Python} --- {PySide6} documentation.
+\newblock \url{https://doc.qt.io/qtforpython-6/}, 2024.
+\newblock Accessed: January 2026.
+
+\end{thebibliography}

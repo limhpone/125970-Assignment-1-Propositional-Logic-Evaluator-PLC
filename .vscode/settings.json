@@ -4,5 +4,28 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python-envs.defaultEnvManager": "ms-python.python:venv"
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
+
+    "latex-workshop.latex.tools": [
+        {
+            "name": "pdflatex",
+            "command": "pdflatex",
+            "args": ["-synctex=1", "-interaction=nonstopmode", "-file-line-error", "%DOC%"]
+        },
+        {
+            "name": "bibtex",
+            "command": "bibtex",
+            "args": ["%DOCFILE%"]
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "pdflatex -> bibtex -> pdflatex x2",
+            "tools": ["pdflatex", "bibtex", "pdflatex", "pdflatex"]
+        },
+        {
+            "name": "pdflatex",
+            "tools": ["pdflatex"]
+        }
+    ]
 }

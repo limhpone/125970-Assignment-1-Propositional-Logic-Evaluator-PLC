@@ -1,0 +1,230 @@
+\chapter*{APPENDIX A: SOURCE CODE AVAILABILITY}
+\addcontentsline{toc}{chapter}{APPENDIX A: SOURCE CODE AVAILABILITY}
+
+The complete source code for the Propositional Logic Evaluator is publicly available on GitHub:
+
+\begin{center}
+\textbf{\url{https://github.com/limhpone/125970-Assignment-1-Propositional-Logic-Evaluator-PLC.git}}
+\end{center}
+
+The repository contains the following components:
+
+\begin{itemize}
+    \item \textbf{Lexical analyser} (\texttt{components/lexica.py}) --- tokenises input expressions into \texttt{TRUE}, \texttt{FALSE}, \texttt{AND}, \texttt{OR}, \texttt{LPAREN}, \texttt{RPAREN}
+    \item \textbf{LALR(1) parser} (\texttt{components/parsers.py}) --- parses token streams and builds an abstract syntax tree
+    \item \textbf{AST node classes} (\texttt{components/ast/statement.py}) --- \texttt{Expression\_bool} (leaf) and \texttt{Expression\_logic} (binary) with \texttt{run()} and \texttt{prefix()} methods
+    \item \textbf{GUI layout} (\texttt{components/ui.py}) --- PySide6 interface definition
+    \item \textbf{Entry point} (\texttt{main.py}) --- GUI window creation and pipeline orchestration
+\end{itemize}
+
+\section*{How to Run}
+
+\begin{enumerate}
+    \item Clone the repository:
+    \begin{verbatim}
+    git clone https://github.com/limhpone/
+        125970-Assignment-1-Propositional-Logic-Evaluator-PLC.git
+    \end{verbatim}
+    \item Install dependencies using \texttt{uv}:
+    \begin{verbatim}
+    uv sync
+    \end{verbatim}
+    \item Run the application:
+    \begin{verbatim}
+    cd src/125970eval
+    uv run main.py
+    \end{verbatim}
+\end{enumerate}
+
+\section*{Source Code Listings}
+
+The key implementation files are reproduced below for reference.
+
+\subsection*{A.1 Lexical Analyser --- \texttt{components/lexica.py}}
+
+\begin{lstlisting}[language=Python]
+from sly import Lexer
+
+class PropLogicLexer(Lexer):
+    tokens = { TRUE, FALSE, AND, OR, LPAREN, RPAREN }
+
+    ignore = ' \t'
+
+    AND    = r'[∧&]'
+    OR     = r'[∨|]'
+    LPAREN = r'\('
+    RPAREN = r'\)'
+    TRUE   = r't'
+    FALSE  = r'f'
+
+    @_(r'\n+')
+    def ignore_newline(self, t):
+        self.lineno += t.value.count('\n')
+
+    def error(self, t):
+        self.index += 1
+        print(f"ERROR: Illegal character '{t.value[0]}' "
+              f"at line {self.lineno}")
+\end{lstlisting}
+
+\subsection*{A.2 Parser --- \texttt{components/parsers.py}}
+
+\begin{lstlisting}[language=Python]
+from components.lexica import PropLogicLexer
+from components.ast.statement import (Expression, Expression_bool,
+                                      Expression_logic, Operations)
+from sly import Parser
+
+class PropLogicParser(Parser):
+    debugfile = 'parser.out'
+    start = 'statement'
+    tokens = PropLogicLexer.tokens
+    precedence = (
+        ('left', OR),
+        ('left', AND),
+    )
+
+    @_('expr')
+    def statement(self, p):
+        return p.expr
+
+    @_('expr OR expr')
+    def expr(self, p) -> Expression:
+        return Expression_logic(Operations.OR, p.expr0, p.expr1)
+
+    @_('expr AND expr')
+    def expr(self, p) -> Expression:
+        return Expression_logic(Operations.AND, p.expr0, p.expr1)
+
+    @_('LPAREN expr RPAREN')
+    def expr(self, p) -> Expression:
+        return p.expr
+
+    @_('TRUE')
+    def expr(self, p) -> Expression:
+        return Expression_bool(True)
+
+    @_('FALSE')
+    def expr(self, p) -> Expression:
+        return Expression_bool(False)
+\end{lstlisting}
+
+\subsection*{A.3 AST Node Classes --- \texttt{components/ast/statement.py}}
+
+\begin{lstlisting}[language=Python]
+from enum import Enum
+from abc import ABC, abstractmethod
+
+class Operations(Enum):
+    AND = 0
+    OR = 1
+
+class Expression(ABC):
+    @abstractmethod
+    def __init__(self) -> None:
+        self.value = None
+
+    @abstractmethod
+    def run(self):
+        pass
+
+    @abstractmethod
+    def prefix(self) -> str:
+        pass
+
+class Expression_bool(Expression):
+    def __init__(self, value: bool) -> None:
+        self.value: bool = value
+
+    def run(self):
+        return self.value
+
+    def prefix(self) -> str:
+        return 't' if self.value else 'f'
+
+class Expression_logic(Expression):
+    def __init__(self, operation: Operations,
+                 left: Expression,
+                 right: Expression) -> None:
+        self.operation = operation
+        self.left = left
+        self.right = right
+        self.value = None
+
+    def run(self):
+        left_val = self.left.run()
+        right_val = self.right.run()
+        if self.operation == Operations.AND:
+            self.value = left_val and right_val
+        elif self.operation == Operations.OR:
+            self.value = left_val or right_val
+        return self.value
+
+    def prefix(self) -> str:
+        op_str = '∧' if self.operation == Operations.AND else '∨'
+        return (f"({op_str} {self.left.prefix()} "
+                f"{self.right.prefix()})")
+\end{lstlisting}
+
+\subsection*{A.4 Main Entry Point --- \texttt{main.py}}
+
+\begin{lstlisting}[language=Python]
+import sys
+from PySide6.QtWidgets import QApplication, QMainWindow
+from components.lexica import PropLogicLexer
+from components.parsers import PropLogicParser
+from components.ui import Ui_MainWindow
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        self.ui.button_t.clicked.connect(lambda: self.push("t"))
+        self.ui.button_f.clicked.connect(lambda: self.push("f"))
+        self.ui.button_and.clicked.connect(
+            lambda: self.push(" \u2227 "))
+        self.ui.button_or.clicked.connect(
+            lambda: self.push(" \u2228 "))
+        self.ui.button_lparen.clicked.connect(
+            lambda: self.push("("))
+        self.ui.button_rparen.clicked.connect(
+            lambda: self.push(")"))
+        self.ui.button_clear.clicked.connect(self.clear)
+        self.ui.button_equal.clicked.connect(self.evaluate)
+
+    def push(self, text: str):
+        current_text = self.ui.input_text.text()
+        self.ui.input_text.setText(f"{current_text}{text}")
+
+    def clear(self):
+        self.ui.input_text.setText("")
+        self.ui.output_value.setText("")
+        self.ui.output_prefix.setText("")
+
+    def evaluate(self):
+        lexer = PropLogicLexer()
+        parser = PropLogicParser()
+        input_text = self.ui.input_text.text()
+        try:
+            result = parser.parse(lexer.tokenize(input_text))
+            if result is not None:
+                truth_value = result.run()
+                self.ui.output_value.setText(
+                    't' if truth_value else 'f')
+                self.ui.output_prefix.setText(result.prefix())
+            else:
+                self.ui.output_value.setText(
+                    "Error: Invalid expression")
+                self.ui.output_prefix.setText("")
+        except Exception as e:
+            self.ui.output_value.setText(f"Error: {e}")
+            self.ui.output_prefix.setText("")
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
+\end{lstlisting}

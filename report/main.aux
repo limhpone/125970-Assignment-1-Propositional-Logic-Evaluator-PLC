@@ -1,0 +1,131 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@input{0_-_cover.aux}
+\@writefile{toc}{\contentsline {chapter}{ABSTRACT}{ii}{section*.1}\protected@file@percent }
+\citation{ben2012mathematical}
+\citation{aho2006compilers}
+\@writefile{toc}{\contentsline {chapter}{\numberline {1}INTRODUCTION AND LANGUAGE DESIGN}{1}{chapter.1}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {1.1}Background and Problem Statement}{1}{section.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1.2}Propositional Logic}{1}{section.1.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1.1}{\ignorespaces Truth tables for conjunction ($\wedge $) and disjunction ($\vee $)}}{2}{table.caption.5}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{table:truth_tables}{{1.1}{2}{Truth tables for conjunction ($\wedge $) and disjunction ($\vee $)}{table.caption.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {1.3}Alphabet and Token Specification}{2}{section.1.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1.2}{\ignorespaces Token specification for the propositional logic language}}{2}{table.caption.6}\protected@file@percent }
+\newlabel{table:tokens}{{1.2}{2}{Token specification for the propositional logic language}{table.caption.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {1.4}Context-Free Grammar}{2}{section.1.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1.3}{\ignorespaces Production rules of the context-free grammar}}{3}{table.caption.7}\protected@file@percent }
+\newlabel{table:grammar_rules}{{1.3}{3}{Production rules of the context-free grammar}{table.caption.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {1.5}Operator Precedence and Associativity}{3}{section.1.5}\protected@file@percent }
+\newlabel{sec:precedence}{{1.5}{3}{Operator Precedence and Associativity}{section.1.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1.4}{\ignorespaces Operator precedence and associativity}}{3}{table.caption.8}\protected@file@percent }
+\newlabel{table:precedence}{{1.4}{3}{Operator precedence and associativity}{table.caption.8}{}}
+\citation{lukasiewicz1957}
+\@writefile{toc}{\contentsline {section}{\numberline {1.6}Notation Systems}{4}{section.1.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1.5}{\ignorespaces Comparison of notation systems}}{4}{table.caption.9}\protected@file@percent }
+\newlabel{table:notations}{{1.5}{4}{Comparison of notation systems}{table.caption.9}{}}
+\citation{aho2006compilers}
+\@writefile{toc}{\contentsline {chapter}{\numberline {2}SYSTEM ARCHITECTURE}{5}{chapter.2}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {2.1}Compiler Front-End Pipeline}{5}{section.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2.1}{\ignorespaces System pipeline: input string $\rightarrow $ lexer $\rightarrow $ parser $\rightarrow $ AST $\rightarrow $ evaluation and translation}}{5}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:pipeline}{{2.1}{5}{System pipeline: input string $\rightarrow $ lexer $\rightarrow $ parser $\rightarrow $ AST $\rightarrow $ evaluation and translation}{figure.caption.10}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2.1}{\ignorespaces Phases of the compiler front-end pipeline}}{5}{table.caption.11}\protected@file@percent }
+\newlabel{table:pipeline_phases}{{2.1}{5}{Phases of the compiler front-end pipeline}{table.caption.11}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.2}Project Structure}{5}{section.2.2}\protected@file@percent }
+\citation{beazley2023sly}
+\citation{qtforpython2024}
+\citation{astral2024uv}
+\@writefile{lot}{\contentsline {table}{\numberline {2.2}{\ignorespaces Project file structure and component responsibilities}}{6}{table.caption.12}\protected@file@percent }
+\newlabel{table:project_structure}{{2.2}{6}{Project file structure and component responsibilities}{table.caption.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.3}Technology Stack}{6}{section.2.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2.3}{\ignorespaces Technology stack}}{6}{table.caption.13}\protected@file@percent }
+\newlabel{table:tech_stack}{{2.3}{6}{Technology stack}{table.caption.13}{}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}IMPLEMENTATION DETAILS}{6}{chapter.3}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {3.1}Lexical Analyser}{6}{section.3.1}\protected@file@percent }
+\newlabel{lst:lexer}{{3.1}{6}{Token definitions in \texttt {PropLogicLexer}}{lstlisting.3.1}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.1}{\ignorespaces Token definitions in \texttt  {PropLogicLexer}}}{6}{lstlisting.3.1}\protected@file@percent }
+\citation{aho2006compilers}
+\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Tokenisation of \texttt  {t $\vee $ f $\wedge $ f}}}{7}{table.caption.14}\protected@file@percent }
+\newlabel{table:tokenisation}{{3.1}{7}{Tokenisation of \texttt {t $\vee $ f $\wedge $ f}}{table.caption.14}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.2}Parser --- LALR(1)}{7}{section.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}LALR(1) Parsing Algorithm}{7}{subsection.3.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Precedence Declaration}{8}{subsection.3.2.2}\protected@file@percent }
+\newlabel{lst:precedence}{{3.2}{8}{Precedence declaration in \texttt {PropLogicParser}}{lstlisting.3.2}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.2}{\ignorespaces Precedence declaration in \texttt  {PropLogicParser}}}{8}{lstlisting.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Grammar Rules with Semantic Actions}{8}{subsection.3.2.3}\protected@file@percent }
+\newlabel{lst:grammar_rules}{{3.3}{8}{Grammar rules with semantic actions}{lstlisting.3.3}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.3}{\ignorespaces Grammar rules with semantic actions}}{8}{lstlisting.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.4}Parsing Trace}{9}{subsection.3.2.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.2}{\ignorespaces LALR(1) shift-reduce parsing trace for \texttt  {t $\vee $ f $\wedge $ f}}}{9}{table.caption.15}\protected@file@percent }
+\newlabel{table:parse_trace}{{3.2}{9}{LALR(1) shift-reduce parsing trace for \texttt {t $\vee $ f $\wedge $ f}}{table.caption.15}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Abstract Syntax Tree (AST)}{9}{section.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces AST class hierarchy}}{10}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:class_hierarchy}{{3.1}{10}{AST class hierarchy}{figure.caption.16}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.3}{\ignorespaces AST node classes}}{10}{table.caption.17}\protected@file@percent }
+\newlabel{table:ast_classes}{{3.3}{10}{AST node classes}{table.caption.17}{}}
+\newlabel{lst:operations}{{3.4}{10}{\texttt {Operations} enum}{lstlisting.3.4}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.4}{\ignorespaces \texttt  {Operations} enum}}{10}{lstlisting.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}AST Construction Example --- Parse Tree}{10}{subsection.3.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces AST (parse tree) for \texttt  {t $\vee $ f $\wedge $ f} --- $\wedge $ binds tighter and forms a subtree under $\vee $}}{10}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:ast_example}{{3.2}{10}{AST (parse tree) for \texttt {t $\vee $ f $\wedge $ f} --- $\wedge $ binds tighter and forms a subtree under $\vee $}{figure.caption.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces AST (parse tree) for \texttt  {(t $\vee $ f) $\wedge $ f} --- parentheses force $\vee $ to be evaluated first}}{11}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:ast_paren}{{3.3}{11}{AST (parse tree) for \texttt {(t $\vee $ f) $\wedge $ f} --- parentheses force $\vee $ to be evaluated first}{figure.caption.19}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Evaluation --- Truth Value Computation}{11}{section.3.4}\protected@file@percent }
+\newlabel{lst:run}{{3.5}{12}{Evaluation method in \texttt {Expression\_logic}}{lstlisting.3.5}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.5}{\ignorespaces Evaluation method in \texttt  {Expression\_logic}}}{12}{lstlisting.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}Translation --- Prefix Notation Generation}{12}{section.3.5}\protected@file@percent }
+\newlabel{lst:prefix}{{3.6}{12}{Prefix translation in \texttt {Expression\_logic}}{lstlisting.3.6}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.6}{\ignorespaces Prefix translation in \texttt  {Expression\_logic}}}{12}{lstlisting.3.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.6}Graphical User Interface}{13}{section.3.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces GUI layout of the Propositional Logic Evaluator}}{13}{figure.caption.20}\protected@file@percent }
+\newlabel{fig:gui_layout}{{3.4}{13}{GUI layout of the Propositional Logic Evaluator}{figure.caption.20}{}}
+\newlabel{fig:screenshot1}{{3.5a}{13}{Input expression entered}{figure.caption.21}{}}
+\newlabel{sub@fig:screenshot1}{{a}{13}{Input expression entered}{figure.caption.21}{}}
+\newlabel{fig:screenshot2}{{3.5b}{13}{Evaluation result displayed}{figure.caption.21}{}}
+\newlabel{sub@fig:screenshot2}{{b}{13}{Evaluation result displayed}{figure.caption.21}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Screenshots --- Application workflow: entering an expression (a) and viewing the evaluation result (b)}}{13}{figure.caption.21}\protected@file@percent }
+\newlabel{fig:screenshots_workflow}{{3.5}{13}{Screenshots --- Application workflow: entering an expression (a) and viewing the evaluation result (b)}{figure.caption.21}{}}
+\citation{aho2006compilers}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces Screenshot --- Parenthesised expression demonstrating precedence override}}{14}{figure.caption.22}\protected@file@percent }
+\newlabel{fig:screenshot3}{{3.6}{14}{Screenshot --- Parenthesised expression demonstrating precedence override}{figure.caption.22}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.1}GUI Interaction Flow}{14}{subsection.3.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.7}Integration of Parser and Translation}{14}{section.3.7}\protected@file@percent }
+\newlabel{lst:integration}{{3.7}{15}{Pipeline integration in \texttt {MainWindow.evaluate()}}{lstlisting.3.7}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.7}{\ignorespaces Pipeline integration in \texttt  {MainWindow.evaluate()}}}{15}{lstlisting.3.7}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces Integration of parser and translation --- the AST is the bridge between parsing and both output translations}}{15}{figure.caption.23}\protected@file@percent }
+\newlabel{fig:integration_flow}{{3.7}{15}{Integration of parser and translation --- the AST is the bridge between parsing and both output translations}{figure.caption.23}{}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}TESTING AND VERIFICATION}{16}{chapter.4}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Test Cases}{16}{section.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.1}{\ignorespaces Test case results --- all cases pass}}{16}{table.caption.24}\protected@file@percent }
+\newlabel{table:test_results}{{4.1}{16}{Test case results --- all cases pass}{table.caption.24}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}Detailed Analysis of Key Test Cases}{16}{section.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.1}Test Case 5: \texttt  {t $\vee $ f $\wedge $ f} --- Operator Precedence}{16}{subsection.4.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.2}Test Case 6: \texttt  {(t $\vee $ f) $\wedge $ f} --- Parenthesised Grouping}{16}{subsection.4.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}Walkthrough: Complete Pipeline Execution}{17}{section.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}Error Handling}{17}{section.4.4}\protected@file@percent }
+\citation{beazley2023sly}
+\citation{aho2006compilers}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}CONCLUSION}{18}{chapter.5}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\bibstyle{plainnat}
+\bibdata{references}
+\bibcite{aho2006compilers}{{1}{2006}{{Aho et~al.}}{{Aho, Lam, Sethi, and Ullman}}}
+\bibcite{astral2024uv}{{2}{2024}{{Astral}}{{}}}
+\bibcite{beazley2023sly}{{3}{2023}{{Beazley}}{{}}}
+\bibcite{ben2012mathematical}{{4}{2012}{{Ben-Ari}}{{}}}
+\bibcite{lukasiewicz1957}{{5}{1957}{{\L {}ukasiewicz}}{{}}}
+\bibcite{qtforpython2024}{{6}{2024}{{The Qt Company}}{{}}}
+\@writefile{toc}{\contentsline {chapter}{REFERENCES}{19}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{APPENDIX A: SOURCE CODE AVAILABILITY}{20}{chapter*.27}\protected@file@percent }
+\gdef \@abspage@last{28}

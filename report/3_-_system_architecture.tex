@@ -1,0 +1,102 @@
+\chapter{SYSTEM ARCHITECTURE}
+
+\section{Compiler Front-End Pipeline}
+
+The evaluator follows a classical compiler front-end pipeline~\citep{aho2006compilers} consisting of three sequential phases: lexical analysis, syntactic analysis, and semantic processing (evaluation and translation). Figure~\ref{fig:pipeline} illustrates the overall data flow.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=0.5cm and 0.8cm,
+    box/.style={rectangle, rounded corners=4pt, minimum width=2.4cm, minimum height=1.0cm,
+                text centered, font=\small\bfseries, draw=black, thick},
+    arrow/.style={-{Stealth[length=5pt]}, thick, color=arrowgray},
+    label/.style={font=\scriptsize\itshape, text=gray}
+]
+
+\node[box, fill=boxblue]   (input)  {Input String};
+\node[box, fill=boxorange, right=of input]  (lexer)  {Lexer};
+\node[box, fill=boxorange, right=of lexer]  (parser) {Parser};
+\node[box, fill=boxgreen,  right=of parser] (ast)    {AST};
+
+\node[box, fill=boxgreen, above right=0.8cm and -0.3cm of ast] (eval) {\texttt{run()}};
+\node[box, fill=boxgreen, below right=0.8cm and -0.3cm of ast] (prefix) {\texttt{prefix()}};
+
+\node[box, fill=boxblue, right=of eval]   (outval) {Truth Value};
+\node[box, fill=boxblue, right=of prefix] (outpfx) {Prefix String};
+
+\draw[arrow] (input)  -- (lexer);
+\draw[arrow] (lexer)  -- node[above, font=\scriptsize, yshift=2pt] {tokens} (parser);
+\draw[arrow] (parser) -- node[above, font=\scriptsize, yshift=2pt] {tree} (ast);
+\draw[arrow] (ast)    -- (eval);
+\draw[arrow] (ast)    -- (prefix);
+\draw[arrow] (eval)   -- (outval);
+\draw[arrow] (prefix) -- (outpfx);
+
+\node[label, below=0.1cm of input]  {e.g., \texttt{t $\vee$ f $\wedge$ f}};
+\node[label, below=0.1cm of outval] {\texttt{t}};
+\node[label, below=0.1cm of outpfx] {\texttt{($\vee$ t ($\wedge$ f f))}};
+
+\end{tikzpicture}
+\caption{System pipeline: input string $\rightarrow$ lexer $\rightarrow$ parser $\rightarrow$ AST $\rightarrow$ evaluation and translation}
+\label{fig:pipeline}
+\end{figure}
+
+Table~\ref{table:pipeline_phases} summarises the input, output, and responsible component for each phase.
+
+\begin{table}[H]
+\centering
+\caption{Phases of the compiler front-end pipeline}
+\label{table:pipeline_phases}
+\begin{tabular}{@{}clll@{}}
+\toprule
+Phase & Input & Output & Component \\
+\midrule
+1. Lexical Analysis   & Character string & Token stream       & \texttt{PropLogicLexer} \\
+2. Syntactic Analysis & Token stream     & AST (tree)         & \texttt{PropLogicParser} \\
+3a. Evaluation        & AST              & Boolean (\texttt{t}/\texttt{f}) & \texttt{Expression.run()} \\
+3b. Translation       & AST              & Prefix string      & \texttt{Expression.prefix()} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Project Structure}
+
+The source code is organised into a modular package structure under \texttt{src/125970eval/}:
+
+\begin{table}[H]
+\centering
+\caption{Project file structure and component responsibilities}
+\label{table:project_structure}
+\begin{tabular}{@{}ll@{}}
+\toprule
+File & Responsibility \\
+\midrule
+\texttt{main.py}                      & Entry point; GUI window and pipeline orchestration \\
+\texttt{components/lexica.py}          & Lexical analyser (tokeniser) \\
+\texttt{components/parsers.py}         & LALR(1) parser (AST builder) \\
+\texttt{components/ui.py}              & PySide6 GUI layout definition \\
+\texttt{components/ast/statement.py}   & AST node class hierarchy \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Technology Stack}
+
+Table~\ref{table:tech_stack} lists the tools and libraries used in this project.
+
+\begin{table}[H]
+\centering
+\caption{Technology stack}
+\label{table:tech_stack}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Technology & Version & Purpose \\
+\midrule
+Python       & $\geq$ 3.10 & Core implementation language \\
+SLY~\citep{beazley2023sly} & latest (GitHub) & Lexer and LALR(1) parser generator \\
+PySide6~\citep{qtforpython2024}      & $\geq$ 6.10.2 & Qt6-based GUI framework \\
+uv~\citep{astral2024uv}           & latest & Python package and virtual environment manager \\
+\bottomrule
+\end{tabular}
+\end{table}

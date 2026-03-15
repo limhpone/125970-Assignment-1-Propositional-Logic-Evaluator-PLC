@@ -1,0 +1,200 @@
+\documentclass[12pt,a4paper]{report}
+
+% ================================================================
+%  AIT Thesis Format — March 2026
+%  Based on AIT Master's Thesis Format template
+% ================================================================
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{2227}{$\wedge$}
+\DeclareUnicodeCharacter{2228}{$\vee$}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ---- AIT: Times New Roman ----
+\usepackage{mathptmx}
+
+% ---- AIT: A4, 1 inch all margins ----
+\usepackage[a4paper,
+            top=1in, bottom=1in, left=1in, right=1in,
+            headheight=14pt, headsep=0.2in, footskip=0.3in]{geometry}
+
+% ---- AIT: 1.5x line spacing ----
+\usepackage{setspace}
+\setstretch{1.5}
+
+% ---- AIT: No paragraph indent, small skip between paragraphs ----
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+% ---- Colours ----
+\usepackage[table]{xcolor}
+\definecolor{nodeblue}{RGB}{52,120,190}
+\definecolor{nodeorange}{RGB}{230,120,30}
+\definecolor{nodegreen}{RGB}{60,160,80}
+\definecolor{arrowgray}{RGB}{100,100,100}
+\definecolor{boxblue}{RGB}{220,235,250}
+\definecolor{boxorange}{RGB}{255,235,210}
+\definecolor{boxgreen}{RGB}{210,245,220}
+\definecolor{boxred}{RGB}{255,220,220}
+\definecolor{boxgray}{RGB}{240,240,240}
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codeframe}{RGB}{200,200,200}
+\definecolor{keyword}{RGB}{0,0,180}
+\definecolor{comment}{RGB}{0,128,0}
+\definecolor{string}{RGB}{163,21,21}
+
+% ---- TikZ ----
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit,
+                backgrounds, calc, decorations.pathreplacing, shapes.multipart,
+                trees}
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=false, hidelinks}
+
+% ---- Captions (AIT format) ----
+\captionsetup[figure]{
+  font        = {normalsize, bf},
+  labelfont   = {normalsize, bf},
+  labelsep    = period,
+  justification = centering,
+  position    = below,
+  skip        = 6pt
+}
+\captionsetup[table]{
+  font        = normalsize,
+  labelfont   = normalsize,
+  labelsep    = period,
+  justification = centering,
+  position    = above,
+  skip        = 4pt
+}
+
+% ---- AIT Heading Format ----
+\usepackage{titlesec}
+
+% Prevent chapters from forcing a new page
+\makeatletter
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{\par\vspace{20pt}}{}{}
+\makeatother
+
+\titleformat{\chapter}[display]
+  {\normalfont\fontsize{14}{17}\bfseries\centering}
+  {CHAPTER \thechapter}
+  {0pt}
+  {\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{10pt}{12pt}
+
+\titleformat{\section}
+  {\normalfont\fontsize{12}{14}\bfseries}
+  {\thesection\quad}
+  {0em}{}
+\titlespacing*{\section}{0pt}{12pt}{4pt}
+
+\titleformat{\subsection}
+  {\normalfont\fontsize{12}{14}\bfseries\itshape}
+  {\thesubsection\quad}
+  {0em}{}
+\titlespacing*{\subsection}{0pt}{10pt}{3pt}
+
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{12}{14}\bfseries\itshape}
+  {\thesubsubsection\quad}
+  {0em}{}
+\titlespacing*{\subsubsection}{0pt}{8pt}{2pt}
+
+% ---- Page numbers: bottom centre ----
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyfoot[C]{\thepage}
+}
+
+% ---- Code listings ----
+\lstset{
+  language=Python,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\color{keyword}\bfseries,
+  commentstyle=\color{comment}\itshape,
+  stringstyle=\color{string},
+  breaklines=true,
+  lineskip=0.4ex,
+  frame=single,
+  backgroundcolor=\color{codebg},
+  rulecolor=\color{codeframe},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=8pt,
+  showstringspaces=false,
+  tabsize=4,
+  captionpos=b,
+  literate={∧}{{$\wedge$}}1 {∨}{{$\vee$}}1 {—}{{---}}1
+}
+
+\tcbuselibrary{listingsutf8}
+
+% ---- APA references ----
+\usepackage{natbib}
+\setlength{\bibhang}{0.5in}
+\setlength{\bibsep}{0pt}
+
+% ================================================================
+\begin{document}
+
+    \pagenumbering{roman}
+    \include{0_-_cover}
+
+    \clearpage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{ABSTRACT}
+    \chapter*{ABSTRACT}
+    This report presents the design and implementation of a Propositional Logic Evaluator using classical compiler front-end techniques. The system accepts propositional logic expressions composed of truth values (\texttt{t},~\texttt{f}) and binary connectives ($\wedge$,~$\vee$), and produces two outputs: the evaluated truth value and an equivalent expression in prefix (Polish) notation. The implementation follows a four-stage pipeline --- lexical analysis, LALR(1) parsing, abstract syntax tree (AST) evaluation, and prefix translation. A context-free grammar with declarative precedence and associativity rules resolves ambiguity, and the SLY parser-generator library ensures a direct correspondence between the formal grammar and the Python implementation. An interactive GUI built with PySide6 (Qt6) provides convenient expression input and result display. All six required test cases pass correctly.
+
+    \clearpage
+    \phantomsection
+    \renewcommand{\contentsname}{%
+      \normalfont\fontsize{14}{17}\bfseries\MakeUppercase{Contents}}
+    \tableofcontents
+
+    \clearpage
+    \pagenumbering{arabic}
+
+    \input{1_-_introduction}
+    \newpage
+    \input{3_-_system_architecture}
+    \input{4_-_implementation}
+    \input{5_-_testing}
+    \input{6_-_conclusion}
+
+    % ---- References ----
+    \newpage
+    \pagestyle{plain}
+    \phantomsection
+    \addcontentsline{toc}{chapter}{REFERENCES}
+    \renewcommand{\bibsection}{%
+      \chapter*{REFERENCES}%
+    }
+    \bibliographystyle{plainnat}
+    \bibliography{references}
+
+    % ---- Appendices ----
+    \newpage
+    \input{7_-_appendix_source}
+
+\end{document}

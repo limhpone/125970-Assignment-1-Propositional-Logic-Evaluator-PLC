@@ -1,0 +1,150 @@
+\chapter{LANGUAGE DESIGN AND THEORETICAL FOUNDATIONS}
+
+\section{Propositional Logic}
+
+Propositional logic is a branch of mathematical logic concerned with propositions and their truth values~\citep{ben2012mathematical}. This evaluator supports two binary connectives whose semantics are defined by the truth tables in Table~\ref{table:truth_tables}.
+
+The language of propositional logic expressions is defined \emph{recursively} (as specified in the assignment):
+
+\begin{enumerate}
+    \item Any of the truth values \texttt{t} (true) and \texttt{f} (false) is a propositional logic expression.
+    \item If $B$ and $B'$ are propositional logic expressions, then $B \wedge B'$ and $B \vee B'$ are propositional logic expressions.
+\end{enumerate}
+
+Additionally, parenthesised grouping is supported: if $B$ is an expression then $(B)$ is an expression, allowing the user to override default precedence. The operator $\wedge$ has \textbf{higher priority} than $\vee$; for example, the result of \texttt{t $\vee$ f $\wedge$ f} is \texttt{t}.
+
+\begin{table}[H]
+\centering
+\caption{Truth tables for conjunction ($\wedge$) and disjunction ($\vee$)}
+\label{table:truth_tables}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+$p$ & $q$ & $p \wedge q$ & $p \vee q$ \\
+\midrule
+t & t & t & t \\
+t & f & f & t \\
+f & t & f & t \\
+f & f & f & f \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Conjunction} ($\wedge$): The result is \texttt{t} only when \emph{both} operands are \texttt{t}. \\
+\textbf{Disjunction} ($\vee$): The result is \texttt{t} when \emph{at least one} operand is \texttt{t}.
+
+\section{Alphabet and Token Specification}
+
+The input language is defined over the alphabet shown in Table~\ref{table:tokens}. Each symbol or symbol class is associated with a token type produced by the lexical analyser.
+
+\begin{table}[H]
+\centering
+\caption{Token specification for the propositional logic language}
+\label{table:tokens}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Token Name & Regular Expression & Matches & Description \\
+\midrule
+\texttt{TRUE}   & \verb|t|       & \texttt{t}             & Boolean true literal \\
+\texttt{FALSE}  & \verb|f|       & \texttt{f}             & Boolean false literal \\
+\texttt{AND}    & \lstinline![∧&]!   & $\wedge$ or \texttt{\&} & Conjunction operator \\
+\texttt{OR}     & \lstinline![∨|]!  & $\vee$ or \texttt{|}    & Disjunction operator \\
+\texttt{LPAREN} & \verb|\(|     & \texttt{(}              & Left parenthesis \\
+\texttt{RPAREN} & \verb|\)|     & \texttt{)}              & Right parenthesis \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Both Unicode symbols ($\wedge$, $\vee$) and ASCII alternatives (\texttt{\&}, \texttt{|}) are accepted. Whitespace (spaces and tabs) is silently ignored.
+
+\section{Context-Free Grammar}
+
+The syntax of the propositional logic language is defined by the following context-free grammar (CFG):
+
+\begin{equation}
+G = (V_N,\; V_T,\; P,\; S)
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $V_N = \{\; \text{statement},\; \text{expr}\; \}$ --- non-terminal symbols
+    \item $V_T = \{\; \texttt{TRUE},\; \texttt{FALSE},\; \texttt{AND},\; \texttt{OR},\; \texttt{LPAREN},\; \texttt{RPAREN}\; \}$ --- terminal symbols
+    \item $S = \text{statement}$ --- start symbol
+    \item $P$ --- production rules, defined below
+\end{itemize}
+
+The production rules are:
+
+\begin{table}[H]
+\centering
+\caption{Production rules of the context-free grammar}
+\label{table:grammar_rules}
+\begin{tabular}{@{}cll@{}}
+\toprule
+Rule & Production & Description \\
+\midrule
+(1) & $\text{statement} \rightarrow \text{expr}$                        & Top-level entry point \\
+(2) & $\text{expr} \rightarrow \text{expr}\;\texttt{OR}\;\text{expr}$   & Disjunction \\
+(3) & $\text{expr} \rightarrow \text{expr}\;\texttt{AND}\;\text{expr}$  & Conjunction \\
+(4) & $\text{expr} \rightarrow \texttt{LPAREN}\;\text{expr}\;\texttt{RPAREN}$ & Parenthesised grouping \\
+(5) & $\text{expr} \rightarrow \texttt{TRUE}$                           & True literal \\
+(6) & $\text{expr} \rightarrow \texttt{FALSE}$                          & False literal \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Ambiguity.} Rules (2) and (3) make the grammar ambiguous because the expression \texttt{t $\vee$ f $\wedge$ f} admits two distinct parse trees: one where $\vee$ is the root (grouping as $\texttt{t} \vee (\texttt{f} \wedge \texttt{f})$) and one where $\wedge$ is the root (grouping as $(\texttt{t} \vee \texttt{f}) \wedge \texttt{f}$). This ambiguity is resolved by declaring operator \textbf{precedence} and \textbf{associativity} in the LALR(1) parser (Section~\ref{sec:precedence}).
+
+\section{Operator Precedence and Associativity}
+\label{sec:precedence}
+
+To disambiguate the grammar, precedence levels and associativity are declared as shown in Table~\ref{table:precedence}.
+
+\begin{table}[H]
+\centering
+\caption{Operator precedence and associativity}
+\label{table:precedence}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+Precedence Level & Operator & Associativity \\
+\midrule
+1 (lower)  & $\vee$ (OR)  & Left \\
+2 (higher) & $\wedge$ (AND) & Left \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Consequence:} $\wedge$ binds tighter than $\vee$. In the expression \texttt{t $\vee$ f $\wedge$ f}:
+\begin{equation}
+\texttt{t} \vee \texttt{f} \wedge \texttt{f} \;\equiv\; \texttt{t} \vee (\texttt{f} \wedge \texttt{f}) \;\neq\; (\texttt{t} \vee \texttt{f}) \wedge \texttt{f}
+\end{equation}
+
+\textbf{Left associativity} means that chains of the same operator group from left to right:
+\begin{equation}
+\texttt{t} \vee \texttt{f} \vee \texttt{f} \;\equiv\; (\texttt{t} \vee \texttt{f}) \vee \texttt{f}
+\end{equation}
+
+These declarations are passed to the LALR(1) parser generator, which uses them to resolve shift/reduce conflicts in the generated parse table.
+
+\section{Notation Systems}
+
+The evaluator translates infix expressions into \textbf{prefix (Polish) notation}~\citep{lukasiewicz1957}, where the operator precedes its operands. Table~\ref{table:notations} compares the three standard notation systems.
+
+\begin{table}[H]
+\centering
+\caption{Comparison of notation systems}
+\label{table:notations}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Notation & Name & Example & Operator Position \\
+\midrule
+Infix   & Standard        & \texttt{t $\wedge$ f} & Between operands \\
+Prefix  & Polish          & \texttt{($\wedge$ t f)} & Before operands \\
+Postfix & Reverse Polish  & \texttt{t f $\wedge$}   & After operands \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The key advantage of prefix notation is that it eliminates the need for precedence rules --- the grouping structure is fully explicit through parenthesisation:
+\begin{equation}
+\text{Infix: } \texttt{t} \vee (\texttt{f} \wedge \texttt{f}) \;\;\Longrightarrow\;\; \text{Prefix: } (\vee\; \texttt{t}\; (\wedge\; \texttt{f}\; \texttt{f}))
+\end{equation}

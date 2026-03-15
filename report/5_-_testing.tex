@@ -1,0 +1,93 @@
+\chapter{TESTING AND VERIFICATION}
+
+\section{Test Cases}
+
+All six required test cases were executed and verified against expected outputs. Table~\ref{table:test_results} presents the complete results.
+
+\begin{table}[H]
+\centering
+\caption{Test case results --- all cases pass}
+\label{table:test_results}
+\begin{tabular}{@{}clcccc@{}}
+\toprule
+\# & Input & Expected Value & Actual Value & Expected Prefix & Actual Prefix \\
+\midrule
+1 & \texttt{t}                          & \texttt{t} & \texttt{t} & \texttt{t}                              & \texttt{t} \\
+2 & \texttt{f}                          & \texttt{f} & \texttt{f} & \texttt{f}                              & \texttt{f} \\
+3 & \texttt{t $\wedge$ f}               & \texttt{f} & \texttt{f} & \texttt{($\wedge$ t f)}                 & \texttt{($\wedge$ t f)} \\
+4 & \texttt{t $\vee$ f}                 & \texttt{t} & \texttt{t} & \texttt{($\vee$ t f)}                   & \texttt{($\vee$ t f)} \\
+5 & \texttt{t $\vee$ f $\wedge$ f}      & \texttt{t} & \texttt{t} & \texttt{($\vee$ t ($\wedge$ f f))}      & \texttt{($\vee$ t ($\wedge$ f f))} \\
+6 & \texttt{(t $\vee$ f) $\wedge$ f}    & \texttt{f} & \texttt{f} & \texttt{($\wedge$ ($\vee$ t f) f)}      & \texttt{($\wedge$ ($\vee$ t f) f)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Result: All 6 test cases pass.} Expected and actual outputs match for both truth value and prefix notation.
+
+\section{Detailed Analysis of Key Test Cases}
+
+\subsection{Test Case 5: \texttt{t $\vee$ f $\wedge$ f} --- Operator Precedence}
+
+This test case validates that $\wedge$ (AND) binds tighter than $\vee$ (OR).
+
+\textbf{Without precedence rules} (left-to-right), the expression would be parsed as $(\texttt{t} \vee \texttt{f}) \wedge \texttt{f} = \texttt{f}$.
+
+\textbf{With correct precedence} ($\wedge$ before $\vee$), the expression is parsed as $\texttt{t} \vee (\texttt{f} \wedge \texttt{f}) = \texttt{t}$.
+
+The actual output \texttt{t} with prefix \texttt{($\vee$ t ($\wedge$ f f))} confirms that the parser correctly applies $\wedge > \vee$ precedence. The AST for this case is shown in Figure~\ref{fig:ast_example}.
+
+\subsection{Test Case 6: \texttt{(t $\vee$ f) $\wedge$ f} --- Parenthesised Grouping}
+
+This test case validates that explicit parentheses override the default precedence.
+
+\textbf{Default precedence} would evaluate $\texttt{f} \wedge \texttt{f}$ first. But the parentheses force $\texttt{t} \vee \texttt{f}$ to be grouped first:
+\begin{equation}
+(\texttt{t} \vee \texttt{f}) \wedge \texttt{f} \;=\; \texttt{t} \wedge \texttt{f} \;=\; \texttt{f}
+\end{equation}
+
+The actual output \texttt{f} with prefix \texttt{($\wedge$ ($\vee$ t f) f)} confirms correct parenthesised grouping. The AST for this case is shown in Figure~\ref{fig:ast_paren}.
+
+\section{Walkthrough: Complete Pipeline Execution}
+
+This section walks through the complete execution pipeline for the input \texttt{t $\vee$ f $\wedge$ f}, demonstrating how each component transforms the data.
+
+\textbf{Step 1 --- Lexical Analysis:}
+\begin{center}
+\texttt{t $\vee$ f $\wedge$ f} $\;\longrightarrow\;$ \texttt{TRUE\; OR\; FALSE\; AND\; FALSE}
+\end{center}
+
+\textbf{Step 2 --- Parsing (LALR(1) shift-reduce):}
+The parser processes the token stream as shown in Table~\ref{table:parse_trace} (Chapter 4), building the AST bottom-up through 11 shift/reduce steps.
+
+\textbf{Step 3 --- AST Construction:}
+The resulting AST is shown in Figure~\ref{fig:ast_example} (Chapter 4): a $\vee$ root with \texttt{t} as the left child and a $\wedge$ subtree as the right child.
+
+\textbf{Step 4 --- Evaluation (\texttt{run()}):}
+Bottom-up traversal:
+\begin{align}
+\texttt{f} \wedge \texttt{f} &= \texttt{f} \\
+\texttt{t} \vee \texttt{f} &= \texttt{t}
+\end{align}
+
+\textbf{Step 5 --- Translation (\texttt{prefix()}):}
+Pre-order traversal:
+\begin{equation}
+(\vee\; \texttt{t}\; (\wedge\; \texttt{f}\; \texttt{f}))
+\end{equation}
+
+\textbf{Final Output:}
+\begin{center}
+Truth Value $=$ \texttt{t}, \quad Prefix Notation $=$ \texttt{($\vee$ t ($\wedge$ f f))}
+\end{center}
+
+\section{Error Handling}
+
+The evaluator handles invalid input at three levels:
+
+\begin{itemize}
+    \item \textbf{Lexical errors:} If the input contains an unrecognised character (e.g.\ \texttt{x}), the lexer's \texttt{error()} method reports the illegal character and its position, then advances past it to continue scanning.
+    \item \textbf{Syntax errors:} If the token stream does not conform to the grammar (e.g.\ \texttt{t t} or \texttt{t $\wedge$}), the LALR(1) parser returns \texttt{None}, and the GUI displays an error message instead of a result.
+    \item \textbf{Runtime exceptions:} Any unexpected exception during the pipeline is caught by the \texttt{evaluate()} method, and the error message is displayed in the truth value output field.
+\end{itemize}
+
+This layered approach ensures the application never crashes on malformed input and always provides feedback to the user.
