@@ -1,5 +1,4 @@
 from sly import Lexer
-import sly
 
 class PropLogicLexer(Lexer):
     """
@@ -28,12 +27,12 @@ class PropLogicLexer(Lexer):
         self.lineno += t.value.count('\n')
 
     def error(self, t):
+        bad = t.value[0]
         self.index += 1
-        print(f"ERROR: Illegal character '{t.value[0]}' at line {self.lineno}")
+        raise ValueError(f"Illegal character '{bad}' at position {self.index}")
 
 if __name__ == '__main__':
     string_input: str = "t ∧ f ∨ t"
     lex = PropLogicLexer()
-    token: sly.lex.Token
     for token in lex.tokenize(string_input):
         print(token)

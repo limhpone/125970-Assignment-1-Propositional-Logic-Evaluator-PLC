@@ -7,6 +7,12 @@ The complete source code for the Propositional Logic Evaluator is publicly avail
 \textbf{\url{https://github.com/limhpone/125970-Assignment-1-Propositional-Logic-Evaluator-PLC.git}}
 \end{center}
 
+\noindent A video walkthrough demonstrating the evaluator in action is available on YouTube:
+
+\begin{center}
+\textbf{\url{https://youtu.be/jVUvnhstTXY}}
+\end{center}
+
 The repository contains the following components:
 
 \begin{itemize}
@@ -62,9 +68,11 @@ class PropLogicLexer(Lexer):
         self.lineno += t.value.count('\n')
 
     def error(self, t):
+        bad = t.value[0]
         self.index += 1
-        print(f"ERROR: Illegal character '{t.value[0]}' "
-              f"at line {self.lineno}")
+        raise ValueError(
+            f"Illegal character '{bad}' "
+            f"at position {self.index}")
 \end{lstlisting}
 
 \subsection*{A.2 Parser --- \texttt{components/parsers.py}}
@@ -218,6 +226,9 @@ class MainWindow(QMainWindow):
                 self.ui.output_value.setText(
                     "Error: Invalid expression")
                 self.ui.output_prefix.setText("")
+        except ValueError as e:
+            self.ui.output_value.setText(f"Error: {e}")
+            self.ui.output_prefix.setText("")
         except Exception as e:
             self.ui.output_value.setText(f"Error: {e}")
             self.ui.output_prefix.setText("")

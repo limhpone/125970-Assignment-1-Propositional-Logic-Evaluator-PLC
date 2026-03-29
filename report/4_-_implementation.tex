@@ -18,16 +18,18 @@ class PropLogicLexer(Lexer):
     FALSE  = r'f'
 
     def error(self, t):
+        bad = t.value[0]
         self.index += 1
-        print(f"ERROR: Illegal character '{t.value[0]}' "
-              f"at line {self.lineno}")
+        raise ValueError(
+            f"Illegal character '{bad}' "
+            f"at position {self.index}")
 \end{lstlisting}
 
 \textbf{Key design choices:}
 \begin{itemize}
     \item Both Unicode ($\wedge$, $\vee$) and ASCII (\texttt{\&}, \texttt{|}) operators are accepted via character class regex patterns.
     \item The \texttt{ignore} attribute silently consumes whitespace.
-    \item The \texttt{error()} method reports illegal characters with their line number, advances past the offending character, and continues scanning.
+    \item The \texttt{error()} method raises a \texttt{ValueError} with a message identifying the illegal character and its position.  This exception propagates up to the GUI, which displays the error to the user.
 \end{itemize}
 
 \textbf{Tokenisation example.} For the input \texttt{t $\vee$ f $\wedge$ f}, the lexer produces the token stream shown in Table~\ref{table:tokenisation}.
@@ -57,20 +59,7 @@ The parser is implemented in \texttt{components/parsers.py} as the class \texttt
 
 \subsection{LALR(1) Parsing Algorithm}
 
-LALR(1) is a \textbf{bottom-up} parsing algorithm that:
-\begin{itemize}
-    \item Reads input \textbf{left to right} (L)
-    \item Produces a \textbf{rightmost derivation} in reverse (R)
-    \item Uses \textbf{1 token} of lookahead to make parsing decisions
-\end{itemize}
-
-It operates using a \textbf{shift-reduce} mechanism:
-\begin{itemize}
-    \item \textbf{Shift:} Push the next input token onto the parse stack.
-    \item \textbf{Reduce:} When the top of the stack matches the right-hand side of a production rule, replace it with the left-hand side non-terminal and execute the associated \textbf{semantic action} (constructing an AST node).
-\end{itemize}
-
-The SLY library automatically generates the LALR(1) parse table from the grammar rules and precedence declarations. A debug file (\texttt{parser.out}) is produced containing the full state machine for inspection.
+LALR(1) is a \textbf{bottom-up} parsing algorithm that reads input left to right, produces a rightmost derivation in reverse, and uses one token of lookahead~\citep{aho2006compilers}.  It operates via a \textbf{shift-reduce} mechanism: \emph{shift} pushes the next token onto the parse stack, while \emph{reduce} replaces a sequence matching a production's right-hand side with the corresponding non-terminal, executing the associated semantic action (AST node construction).  Parsing runs in $O(n)$ time with respect to input length, and the SLY library automatically generates the LALR(1) parse table from the grammar rules and precedence declarations.
 
 \subsection{Precedence Declaration}
 
@@ -264,33 +253,15 @@ Figure~\ref{fig:ast_paren} shows the AST for the parenthesised expression \textt
 
 \section{Evaluation --- Truth Value Computation}
 
-The \texttt{run()} method evaluates the AST by performing a recursive \textbf{bottom-up (post-order) tree traversal}.
+The \texttt{run()} method evaluates the AST by recursive \textbf{post-order traversal}.  Leaf nodes return their boolean value directly; binary nodes recursively evaluate both children and then apply the logical operation.
 
-\textbf{For leaf nodes} (\texttt{Expression\_bool}):
-\begin{equation}
-\texttt{run}() = \texttt{value} \in \{\text{True}, \text{False}\}
-\end{equation}
-
-\textbf{For binary nodes} (\texttt{Expression\_logic}):
 \begin{equation}
 \texttt{run}() = \begin{cases}
-\texttt{left.run()} \;\wedge\; \texttt{right.run()} & \text{if operation} = \text{AND} \\[6pt]
+\texttt{value} & \text{(leaf node)} \\[4pt]
+\texttt{left.run()} \;\wedge\; \texttt{right.run()} & \text{if operation} = \text{AND} \\[4pt]
 \texttt{left.run()} \;\vee\; \texttt{right.run()} & \text{if operation} = \text{OR}
 \end{cases}
 \end{equation}
-
-\textbf{Evaluation trace for \texttt{t $\vee$ f $\wedge$ f}} (using the AST from Figure~\ref{fig:ast_example}):
-
-\begin{enumerate}
-    \item Evaluate left child of $\vee$: \texttt{Bool(t)} $\rightarrow$ True
-    \item Evaluate right child of $\vee$ (the $\wedge$ subtree):
-    \begin{enumerate}
-        \item Evaluate left child of $\wedge$: \texttt{Bool(f)} $\rightarrow$ False
-        \item Evaluate right child of $\wedge$: \texttt{Bool(f)} $\rightarrow$ False
-        \item Compute: $\text{False} \wedge \text{False} = \text{False}$
-    \end{enumerate}
-    \item Compute: $\text{True} \vee \text{False} = \text{True} \rightarrow$ \texttt{t}
-\end{enumerate}
 
 \begin{lstlisting}[caption={Evaluation method in \texttt{Expression\_logic}}, label={lst:run}]
 def run(self):
@@ -306,37 +277,14 @@ def run(self):
 
 \section{Translation --- Prefix Notation Generation}
 
-The \texttt{prefix()} method converts the AST into a fully parenthesised prefix notation string via a recursive \textbf{pre-order tree traversal}.
+The \texttt{prefix()} method converts the AST into a fully parenthesised prefix notation string via recursive \textbf{pre-order traversal}.  Leaf nodes return \texttt{"t"} or \texttt{"f"}; binary nodes output \texttt{(op left right)}.
 
-\textbf{For leaf nodes:}
 \begin{equation}
 \texttt{prefix}() = \begin{cases}
-\texttt{"t"} & \text{if value is True} \\
-\texttt{"f"} & \text{if value is False}
+\texttt{"t"} / \texttt{"f"} & \text{(leaf node)} \\[4pt]
+\texttt{"("} + op + \texttt{" "} + \texttt{left.prefix()} + \texttt{" "} + \texttt{right.prefix()} + \texttt{")"} & \text{(binary node)}
 \end{cases}
 \end{equation}
-
-\textbf{For binary nodes:}
-\begin{equation}
-\texttt{prefix}() = \texttt{"("} \;+\; op \;+\; \texttt{" "} \;+\; \texttt{left.prefix()} \;+\; \texttt{" "} \;+\; \texttt{right.prefix()} \;+\; \texttt{")"}
-\end{equation}
-
-where $op \in \{\wedge, \vee\}$ is determined by the node's operation.
-
-\textbf{Translation trace for \texttt{t $\vee$ f $\wedge$ f}}:
-\begin{enumerate}
-    \item \texttt{prefix}($\vee$ node):
-    \begin{enumerate}
-        \item Left child: \texttt{prefix}(\texttt{Bool(t)}) = \texttt{"t"}
-        \item Right child: \texttt{prefix}($\wedge$ node):
-        \begin{enumerate}
-            \item Left: \texttt{prefix}(\texttt{Bool(f)}) = \texttt{"f"}
-            \item Right: \texttt{prefix}(\texttt{Bool(f)}) = \texttt{"f"}
-            \item Result: \texttt{"($\wedge$ f f)"}
-        \end{enumerate}
-        \item Result: \texttt{"($\vee$ t ($\wedge$ f f))"}
-    \end{enumerate}
-\end{enumerate}
 
 \begin{lstlisting}[caption={Prefix translation in \texttt{Expression\_logic}}, label={lst:prefix}]
 def prefix(self) -> str:
@@ -344,7 +292,7 @@ def prefix(self) -> str:
     return f"({op_str} {self.left.prefix()} {self.right.prefix()})"
 \end{lstlisting}
 
-\textbf{Key property:} The output is \textbf{fully parenthesised}, making the grouping structure explicit without relying on precedence rules. This ensures the prefix string is an unambiguous representation of the AST.
+The output is fully parenthesised, making grouping explicit without relying on precedence rules.
 
 
 \section{Graphical User Interface}
@@ -398,59 +346,53 @@ Figure~\ref{fig:gui_layout} shows the GUI layout:
 \centering
 \begin{subfigure}[t]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{screenshot1.png}
-    \caption{Input expression entered}
-    \label{fig:screenshot1}
+    \includegraphics[width=\textwidth]{gui-preview.png}
+    \caption{Empty GUI on launch}
+    \label{fig:gui_preview}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{screenshot2.png}
-    \caption{Evaluation result displayed}
-    \label{fig:screenshot2}
+    \includegraphics[width=\textwidth]{order-precedence.png}
+    \caption{Operator precedence: \texttt{t $\vee$ f $\wedge$ f $\Rightarrow$ t}}
+    \label{fig:order_precedence}
 \end{subfigure}
-\caption{Screenshots --- Application workflow: entering an expression (a) and viewing the evaluation result (b)}
-\label{fig:screenshots_workflow}
-\end{figure}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.55\textwidth]{screenshot3.png}
-\caption{Screenshot --- Parenthesised expression demonstrating precedence override}
-\label{fig:screenshot3}
+\vspace{0.5em}
+
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{precedence-leftassoc.png}
+    \caption{Left-associativity: \texttt{f $\vee$ f $\wedge$ t $\vee$ t $\Rightarrow$ t}}
+    \label{fig:precedence_leftassoc}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{error-illegalchar.png}
+    \caption{Error handling: illegal character \texttt{x}}
+    \label{fig:error_illegalchar}
+\end{subfigure}
+\caption{Application screenshots --- GUI layout, operator precedence, left-associativity, and error handling}
+\label{fig:screenshots}
 \end{figure}
 
 \subsection{GUI Interaction Flow}
 
-When the user clicks the \textbf{Evaluate} button, the following pipeline executes:
-
-\begin{enumerate}
-    \item A fresh \texttt{PropLogicLexer} and \texttt{PropLogicParser} are instantiated.
-    \item The input text is tokenised by the lexer.
-    \item The parser builds an AST from the token stream.
-    \item \texttt{result.run()} computes the truth value.
-    \item \texttt{result.prefix()} generates the prefix notation string.
-    \item Both results are displayed in the output labels.
-    \item If the input is invalid, an error message is shown instead.
-\end{enumerate}
+When the user clicks \textbf{Evaluate}, a fresh lexer and parser are instantiated. The input text is tokenised, parsed into an AST, and the AST's \texttt{run()} and \texttt{prefix()} methods produce the truth value and prefix string, respectively.  If the input is invalid, an error message is displayed instead.
 
 
 \section{Integration of Parser and Translation}
 
-The assignment requires both a \textbf{truth value} and an \textbf{equivalent prefix notation} from a single input expression.  A na\"ive approach would be to evaluate during parsing (embedding computation inside the grammar rules).  Instead, this implementation uses the AST as an \textbf{intermediate representation} that decouples parsing from downstream processing.  The integration works as follows:
+The assignment requires both a truth value and a prefix notation string from a single input.  Rather than embedding computation inside grammar rules, this implementation uses the AST as an \textbf{intermediate representation} that decouples parsing from downstream processing:
 
 \begin{enumerate}
-    \item \textbf{Parser $\rightarrow$ AST (syntax-directed translation).}
-          Each grammar rule contains a \textbf{semantic action} (Listing~\ref{lst:grammar_rules}) that constructs an AST node.  As the LALR(1) parser performs bottom-up reductions, it simultaneously builds the tree --- this is a form of \emph{syntax-directed translation}~\citep{aho2006compilers}.  The parser's output is the root \texttt{Expression} node.
-
-    \item \textbf{AST $\rightarrow$ Truth value (post-order traversal).}
-          The root's \texttt{run()} method (Listing~\ref{lst:run}) recursively evaluates child nodes before the parent, implementing a bottom-up (\emph{post-order}) traversal that mirrors the semantics of propositional logic.
-
-    \item \textbf{AST $\rightarrow$ Prefix string (pre-order traversal).}
-          The root's \texttt{prefix()} method (Listing~\ref{lst:prefix}) visits the operator before its children, implementing a top-down (\emph{pre-order}) traversal that directly produces fully parenthesised prefix notation.
+    \item \textbf{Parser $\rightarrow$ AST:} Each grammar rule's semantic action (Listing~\ref{lst:grammar_rules}) constructs an AST node during bottom-up reduction --- a form of \emph{syntax-directed translation}~\citep{aho2006compilers}.
+    \item \textbf{AST $\rightarrow$ Truth value:} \texttt{run()} performs a post-order traversal (Listing~\ref{lst:run}).
+    \item \textbf{AST $\rightarrow$ Prefix string:} \texttt{prefix()} performs a pre-order traversal (Listing~\ref{lst:prefix}).
 \end{enumerate}
 
-\textbf{Why this design?}  Because both \texttt{run()} and \texttt{prefix()} are independent traversals of the \emph{same} AST, the expression is parsed \textbf{only once} and the tree is reused:
+Because both traversals operate on the \emph{same} tree, the expression is parsed only once:
 
 \begin{lstlisting}[caption={Pipeline integration in \texttt{MainWindow.evaluate()}}, label={lst:integration}]
 result = parser.parse(lexer.tokenize(input_text))  # parse once
@@ -458,35 +400,4 @@ truth_value = result.run()                          # traversal 1
 prefix_str  = result.prefix()                       # traversal 2
 \end{lstlisting}
 
-Figure~\ref{fig:integration_flow} summarises the data flow between the parser and the two translation passes.
-
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-    node distance=0.5cm and 0.7cm,
-    box/.style={rectangle, rounded corners=4pt, minimum width=2.2cm, minimum height=0.8cm,
-                text centered, font=\footnotesize\bfseries, draw=black, thick},
-    arrow/.style={-{Stealth[length=5pt]}, thick, color=arrowgray},
-]
-\node[box, fill=boxblue]                      (input)  {Input String};
-\node[box, fill=boxorange, right=of input]    (parse)  {LALR(1) Parser};
-\node[box, fill=boxgreen,  right=of parse]    (ast)    {AST};
-
-\node[box, fill=boxgreen, above right=0.8cm and 0.3cm of ast] (run)    {\texttt{run()}};
-\node[box, fill=boxgreen, below right=0.8cm and 0.3cm of ast] (pfx)    {\texttt{prefix()}};
-
-\node[box, fill=boxblue, right=of run]  (oval)  {Truth Value};
-\node[box, fill=boxblue, right=of pfx]  (opfx)  {Prefix String};
-
-\draw[arrow] (input)  -- node[above, font=\scriptsize, yshift=9pt] {tokenise} (parse);
-\draw[arrow] (parse)  -- node[above, font=\scriptsize, yshift=9pt] {semantic actions} (ast);
-\draw[arrow] (ast)    -- node[above left, font=\scriptsize] {post-order} (run);
-\draw[arrow] (ast)    -- node[below left, font=\scriptsize] {pre-order} (pfx);
-\draw[arrow] (run)    -- (oval);
-\draw[arrow] (pfx)    -- (opfx);
-\end{tikzpicture}
-\caption{Integration of parser and translation --- the AST is the bridge between parsing and both output translations}
-\label{fig:integration_flow}
-\end{figure}
-
-\textbf{Key insight:} The parser is responsible for \emph{structural analysis} (building the tree with correct precedence and grouping), while translation is a separate phase that \emph{walks} the already-built tree.  This clean separation means adding a new output format (e.g.\ postfix notation) requires only a new traversal method --- the parser and grammar remain unchanged.
+This clean separation means adding a new output format (e.g.\ postfix notation) requires only a new traversal method --- the parser and grammar remain unchanged.

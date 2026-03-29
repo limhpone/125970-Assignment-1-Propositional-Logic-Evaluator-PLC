@@ -24,70 +24,46 @@ All six required test cases were executed and verified against expected outputs.
 
 \textbf{Result: All 6 test cases pass.} Expected and actual outputs match for both truth value and prefix notation.
 
-\section{Detailed Analysis of Key Test Cases}
+\section{Key Test Cases}
 
-\subsection{Test Case 5: \texttt{t $\vee$ f $\wedge$ f} --- Operator Precedence}
+\textbf{Test 5} (\texttt{t $\vee$ f $\wedge$ f}) validates operator precedence: with $\wedge > \vee$, the expression is parsed as $\texttt{t} \vee (\texttt{f} \wedge \texttt{f}) = \texttt{t}$ (not $(\texttt{t} \vee \texttt{f}) \wedge \texttt{f} = \texttt{f}$). The prefix output \texttt{($\vee$ t ($\wedge$ f f))} confirms correct grouping (see Figure~\ref{fig:ast_example}).
 
-This test case validates that $\wedge$ (AND) binds tighter than $\vee$ (OR).
-
-\textbf{Without precedence rules} (left-to-right), the expression would be parsed as $(\texttt{t} \vee \texttt{f}) \wedge \texttt{f} = \texttt{f}$.
-
-\textbf{With correct precedence} ($\wedge$ before $\vee$), the expression is parsed as $\texttt{t} \vee (\texttt{f} \wedge \texttt{f}) = \texttt{t}$.
-
-The actual output \texttt{t} with prefix \texttt{($\vee$ t ($\wedge$ f f))} confirms that the parser correctly applies $\wedge > \vee$ precedence. The AST for this case is shown in Figure~\ref{fig:ast_example}.
-
-\subsection{Test Case 6: \texttt{(t $\vee$ f) $\wedge$ f} --- Parenthesised Grouping}
-
-This test case validates that explicit parentheses override the default precedence.
-
-\textbf{Default precedence} would evaluate $\texttt{f} \wedge \texttt{f}$ first. But the parentheses force $\texttt{t} \vee \texttt{f}$ to be grouped first:
-\begin{equation}
-(\texttt{t} \vee \texttt{f}) \wedge \texttt{f} \;=\; \texttt{t} \wedge \texttt{f} \;=\; \texttt{f}
-\end{equation}
-
-The actual output \texttt{f} with prefix \texttt{($\wedge$ ($\vee$ t f) f)} confirms correct parenthesised grouping. The AST for this case is shown in Figure~\ref{fig:ast_paren}.
-
-\section{Walkthrough: Complete Pipeline Execution}
-
-This section walks through the complete execution pipeline for the input \texttt{t $\vee$ f $\wedge$ f}, demonstrating how each component transforms the data.
-
-\textbf{Step 1 --- Lexical Analysis:}
-\begin{center}
-\texttt{t $\vee$ f $\wedge$ f} $\;\longrightarrow\;$ \texttt{TRUE\; OR\; FALSE\; AND\; FALSE}
-\end{center}
-
-\textbf{Step 2 --- Parsing (LALR(1) shift-reduce):}
-The parser processes the token stream as shown in Table~\ref{table:parse_trace} (Chapter 4), building the AST bottom-up through 11 shift/reduce steps.
-
-\textbf{Step 3 --- AST Construction:}
-The resulting AST is shown in Figure~\ref{fig:ast_example} (Chapter 4): a $\vee$ root with \texttt{t} as the left child and a $\wedge$ subtree as the right child.
-
-\textbf{Step 4 --- Evaluation (\texttt{run()}):}
-Bottom-up traversal:
-\begin{align}
-\texttt{f} \wedge \texttt{f} &= \texttt{f} \\
-\texttt{t} \vee \texttt{f} &= \texttt{t}
-\end{align}
-
-\textbf{Step 5 --- Translation (\texttt{prefix()}):}
-Pre-order traversal:
-\begin{equation}
-(\vee\; \texttt{t}\; (\wedge\; \texttt{f}\; \texttt{f}))
-\end{equation}
-
-\textbf{Final Output:}
-\begin{center}
-Truth Value $=$ \texttt{t}, \quad Prefix Notation $=$ \texttt{($\vee$ t ($\wedge$ f f))}
-\end{center}
+\textbf{Test 6} (\texttt{(t $\vee$ f) $\wedge$ f}) validates that parentheses override default precedence, yielding $(\texttt{t} \vee \texttt{f}) \wedge \texttt{f} = \texttt{f}$ with prefix \texttt{($\wedge$ ($\vee$ t f) f)} (see Figure~\ref{fig:ast_paren}).
 
 \section{Error Handling}
 
 The evaluator handles invalid input at three levels:
 
 \begin{itemize}
-    \item \textbf{Lexical errors:} If the input contains an unrecognised character (e.g.\ \texttt{x}), the lexer's \texttt{error()} method reports the illegal character and its position, then advances past it to continue scanning.
-    \item \textbf{Syntax errors:} If the token stream does not conform to the grammar (e.g.\ \texttt{t t} or \texttt{t $\wedge$}), the LALR(1) parser returns \texttt{None}, and the GUI displays an error message instead of a result.
+    \item \textbf{Lexical errors:} If the input contains an unrecognised character (e.g.\ \texttt{x}), the lexer's \texttt{error()} method raises a \texttt{ValueError} with a descriptive message including the offending character and its position.  This exception propagates through the pipeline and is caught by the GUI's \texttt{evaluate()} method, which displays the error message directly in the truth-value output field.  The user therefore sees, for example, ``\texttt{Error: Illegal character 'x' at position 5}'' instead of a silent failure.
+    \item \textbf{Syntax errors:} If the token stream does not conform to the grammar (e.g.\ \texttt{t t} or \texttt{t $\wedge$}), no valid AST is returned (the parser yields \texttt{None} in this implementation), and the GUI displays an error message instead of a result.
     \item \textbf{Runtime exceptions:} Any unexpected exception during the pipeline is caught by the \texttt{evaluate()} method, and the error message is displayed in the truth value output field.
 \end{itemize}
 
-This layered approach ensures the application never crashes on malformed input and always provides feedback to the user.
+This layered approach ensures the application never crashes on malformed input and always provides meaningful feedback to the user.
+
+\section{Automated Test Suite}
+
+The project includes an automated test suite (\texttt{tests/test\_evaluator.py}) executed with \textbf{pytest}.  The suite contains 12 tests organised into three groups:
+
+\begin{table}[H]
+\centering
+\caption{Automated test suite summary}
+\label{table:test_suite}
+\begin{tabular}{@{}lcp{6.5cm}@{}}
+\toprule
+Test Group & Count & Purpose \\
+\midrule
+\texttt{TestCoreCases}       & 6 & The six representative test cases from Table~\ref{table:test_results}: literals, conjunction, disjunction, operator precedence, and parenthesised grouping \\
+\texttt{TestASCIIOperators}  & 3 & Verifies that the ASCII alternatives (\texttt{\&}, \texttt{|}) produce identical results to the Unicode operators ($\wedge$,~$\vee$) \\
+\texttt{TestErrorHandling}   & 3 & Checks that illegal characters raise \texttt{ValueError}, incomplete expressions return \texttt{None}, and empty input returns \texttt{None} \\
+\midrule
+\textbf{Total}               & \textbf{12} & \textbf{All pass} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Running the suite:
+\begin{verbatim}
+uv run pytest tests/test_evaluator.py -v
+\end{verbatim}

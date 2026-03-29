@@ -285,7 +285,7 @@ ignore = ' \t'         # Skip whitespace
 
 Whitespace at positions 1, 3, 5, 7 is silently consumed by the `ignore` directive.
 
-**Error handling:** The `error()` method reports illegal characters with their line number, advances past the offending character, and continues scanning.
+**Error handling:** The `error()` method raises a `ValueError` with a descriptive message identifying the illegal character and its position. This exception propagates up to the GUI, which displays the error to the user (e.g., `Error: Illegal character 'x' at position 5`).
 
 ### 6.2 Parser (LALR(1))
 
@@ -526,6 +526,8 @@ All six required test cases were verified to produce the correct output:
 | 4 | `t ∨ f` | `t` | `(∨ t f)` | `t` | `(∨ t f)` | ✅ |
 | 5 | `t ∨ f ∧ f` | `t` | `(∨ t (∧ f f))` | `t` | `(∨ t (∧ f f))` | ✅ |
 | 6 | `(t ∨ f) ∧ f` | `f` | `(∧ (∨ t f) f)` | `f` | `(∧ (∨ t f) f)` | ✅ |
+
+An automated test suite (`tests/test_evaluator.py`) executed with **pytest** contains **12 tests** in three groups: 6 core test cases (above), 3 ASCII-operator equivalence tests (`&` and `|`), and 3 error-handling tests (illegal character raises `ValueError`, incomplete expression returns `None`, empty input returns `None`). All 12 tests pass.
 
 **Explanation of key test cases:**
 

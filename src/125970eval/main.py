@@ -45,6 +45,9 @@ class MainWindow(QMainWindow):
             else:
                 self.ui.output_value.setText("Error: Invalid expression")
                 self.ui.output_prefix.setText("")
+        except ValueError as e:
+            self.ui.output_value.setText(f"Error: {e}")
+            self.ui.output_prefix.setText("")
         except Exception as e:
             self.ui.output_value.setText(f"Error: {e}")
             self.ui.output_prefix.setText("")

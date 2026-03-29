@@ -21,15 +21,26 @@
 
 ## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Overview](#overview)
 - [Features](#features)
 - [Grammar Specification](#grammar-specification)
 - [How It Works](#how-it-works)
 - [Project Structure](#project-structure)
 - [Component Details](#component-details)
+  - [`components/lexica.py` — Lexer](#componentslexicapy--lexer)
+  - [`components/parsers.py` — Parser](#componentsparserspy--parser)
+  - [`components/ast/statement.py` — AST Nodes](#componentsaststatementpy--ast-nodes)
+  - [`components/ui.py` — GUI Layout](#componentsuipy--gui-layout)
+  - [`main.py` — Entry Point](#mainpy--entry-point)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running](#running)
 - [Examples](#examples)
+- [Demo](#demo)
+- [Screenshots](#screenshots)
 
 ---
 
@@ -153,7 +164,7 @@ src/125970eval/
 
 - Supports **Unicode** (`∧` `∨`) and **ASCII** (`&` `|`) operator input
 - Skips whitespace and tabs
-- Reports illegal characters with line number
+- Raises `ValueError` on illegal characters with their position
 
 ### `components/parsers.py` — Parser
 
@@ -248,3 +259,34 @@ uv run main.py
 | `t ∨ f` | `t` | `(∨ t f)` | true OR false = true |
 | `t ∨ f ∧ f` | `t` | `(∨ t (∧ f f))` | `∧` binds first: `f∧f = f`, then `t∨f = t` |
 | `(t ∨ f) ∧ f` | `f` | `(∧ (∨ t f) f)` | Parentheses override: `t∨f = t`, then `t∧f = f` |
+
+---
+
+## Demo
+
+<p align="center">
+  <img src="125970-videowalkthru.gif" alt="Demo walkthrough" width="720"/>
+  <br/>
+  <em>Animated walkthrough of the Propositional Logic Evaluator.</em>
+</p>
+
+<p align="center">
+  <a href="https://youtu.be/jVUvnhstTXY">
+    <img src="https://img.shields.io/badge/Watch%20on-YouTube-red?logo=youtube&logoColor=white" alt="Watch on YouTube"/>
+  </a>
+</p>
+
+---
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="report/gui-preview.png" width="400"/><br/><b>Empty GUI on launch</b></td>
+    <td align="center"><img src="report/order-precedence.png" width="400"/><br/><b>Operator precedence: <code>t ∨ f ∧ f → t</code></b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="report/precedence-leftassoc.png" width="400"/><br/><b>Left-associativity: <code>f ∨ f ∧ t ∨ t → t</code></b></td>
+    <td align="center"><img src="report/error-illegalchar.png" width="400"/><br/><b>Error handling: illegal character <code>x</code></b></td>
+  </tr>
+</table>

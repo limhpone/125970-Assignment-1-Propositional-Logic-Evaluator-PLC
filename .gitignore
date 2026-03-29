@@ -162,3 +162,4 @@ cython_debug/
 parser.out
 src/project
 .DS_Store
+*.mp4
