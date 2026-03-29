@@ -17,6 +17,16 @@
 
 > **Author:** Aye Khin Khin Hpone (Yolanda Lim) — st125970
 
+<p align="center">
+  <img src="125970-videowalkthru.gif" alt="Demo walkthrough" width="720"/>
+</p>
+
+<p align="center">
+  <a href="https://youtu.be/jVUvnhstTXY">
+    <img src="https://img.shields.io/badge/▶%20Watch%20Demo-YouTube-red?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch on YouTube"/>
+  </a>
+</p>
+
 ---
 
 ## Table of Contents
@@ -39,7 +49,6 @@
   - [Installation](#installation)
   - [Running](#running)
 - [Examples](#examples)
-- [Demo](#demo)
 - [Screenshots](#screenshots)
 
 ---
@@ -259,22 +268,6 @@ uv run main.py
 | `t ∨ f` | `t` | `(∨ t f)` | true OR false = true |
 | `t ∨ f ∧ f` | `t` | `(∨ t (∧ f f))` | `∧` binds first: `f∧f = f`, then `t∨f = t` |
 | `(t ∨ f) ∧ f` | `f` | `(∧ (∨ t f) f)` | Parentheses override: `t∨f = t`, then `t∧f = f` |
-
----
-
-## Demo
-
-<p align="center">
-  <img src="125970-videowalkthru.gif" alt="Demo walkthrough" width="720"/>
-  <br/>
-  <em>Animated walkthrough of the Propositional Logic Evaluator.</em>
-</p>
-
-<p align="center">
-  <a href="https://youtu.be/jVUvnhstTXY">
-    <img src="https://img.shields.io/badge/Watch%20on-YouTube-red?logo=youtube&logoColor=white" alt="Watch on YouTube"/>
-  </a>
-</p>
 
 ---
 
